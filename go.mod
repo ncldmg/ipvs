@@ -1,6 +1,6 @@
-module github.com/moby/ipvs
+module github.com/ncldmg/ipvs
 
-go 1.17
+go 1.21
 
 require (
 	github.com/sirupsen/logrus v1.9.0
