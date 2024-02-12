@@ -8,10 +8,11 @@ import (
 	"testing"
 	"time"
 
-	"github.com/moby/ipvs/ns"
 	"github.com/vishvananda/netlink"
 	"github.com/vishvananda/netlink/nl"
 	"golang.org/x/sys/unix"
+
+	"github.com/ncldmg/ipvs/ns"
 )
 
 var (
@@ -79,7 +80,11 @@ func checkDestination(t *testing.T, i *Handle, s *Service, d *Destination, check
 		}
 	case false: // The test expects that the service should not be present
 		if dstFound {
-			t.Fatalf("Did not find the destination %s fwdMethod %s in ipvs output", d.Address.String(), lookupFwMethod(d.ConnectionFlags))
+			t.Fatalf(
+				"Did not find the destination %s fwdMethod %s in ipvs output",
+				d.Address.String(),
+				lookupFwMethod(d.ConnectionFlags),
+			)
 		}
 	}
 }
@@ -93,7 +98,8 @@ func checkService(t *testing.T, i *Handle, s *Service, checkPresent bool) {
 	var svcFound bool
 
 	for _, svc := range svcArray {
-		if svc.Protocol == s.Protocol && svc.Address.String() == s.Address.String() && svc.Port == s.Port {
+		if svc.Protocol == s.Protocol && svc.Address.String() == s.Address.String() &&
+			svc.Port == s.Port {
 			svcFound = true
 			break
 		}
@@ -308,7 +314,11 @@ func TestDestination(t *testing.T) {
 				AddressFamily: nl.FAMILY_V6,
 				IP:            "2001:db8:3c4d:15::1a00",
 				Netmask:       128,
-				Destinations:  []string{"2001:db8:3c4d:15::1a2b", "2001:db8:3c4d:15::1a2c", "2001:db8:3c4d:15::1a2d"},
+				Destinations: []string{
+					"2001:db8:3c4d:15::1a2b",
+					"2001:db8:3c4d:15::1a2c",
+					"2001:db8:3c4d:15::1a2d",
+				},
 			},
 		}
 		for _, td := range testDatas {
