@@ -84,6 +84,7 @@ const (
 	ipvsDestAttrPersistentConnections
 	ipvsDestAttrStats
 	ipvsDestAttrAddressFamily
+	ipvsDestAttrTunType
 )
 
 // IPVS Statistics constants

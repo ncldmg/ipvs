@@ -54,6 +54,7 @@ type Destination struct {
 	Port                uint16
 	Weight              int
 	ConnectionFlags     uint32
+	TunnelType          TunnelType
 	AddressFamily       uint16
 	UpperThreshold      uint32
 	LowerThreshold      uint32
@@ -61,6 +62,16 @@ type Destination struct {
 	InactiveConnections int
 	Stats               DstStats
 }
+
+// TunnelType for ConnectionFlags which can be of type tunnel.
+type TunnelType uint8
+
+// TunnelTypes IPIP, GUE, GRE
+const (
+	IPIP TunnelType = iota
+	GUE
+	GRE
+)
 
 // DstStats defines IPVS destination (real server) statistics
 type DstStats SvcStats
