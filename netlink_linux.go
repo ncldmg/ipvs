@@ -107,19 +107,26 @@ func fillService(s *Service) nl.NetlinkRequestData {
 }
 
 func fillDestination(d *Destination) nl.NetlinkRequestData {
+	cmdAttr := nl.NewRtAttr(ipvsCmdAttrDest, nil)
+
+	nl.NewRtAttrChild(cmdAttr, ipvsDestAttrAddress, rawIPData(d.Address))
 	// Port needs to be in network byte order.
 	portBuf := new(bytes.Buffer)
 	binary.Write(portBuf, binary.BigEndian, d.Port)
+	nl.NewRtAttrChild(cmdAttr, ipvsDestAttrPort, portBuf.Bytes())
 
-	return nl.NewRtAttr(ipvsCmdAttrDest, nil).
-		AddRtAttr(ipvsDestAttrAddress, rawIPData(d.Address)).
-		AddRtAttr(ipvsDestAttrPort, portBuf.Bytes()).
-		AddRtAttr(ipvsDestAttrForwardingMethod, nl.Uint32Attr(d.ConnectionFlags&ConnectionFlagFwdMask)).
-		AddRtAttr(ipvsDestAttrWeight, nl.Uint32Attr(uint32(d.Weight))).
-		AddRtAttr(ipvsDestAttrUpperThreshold, nl.Uint32Attr(d.UpperThreshold)).
-		AddRtAttr(ipvsDestAttrLowerThreshold, nl.Uint32Attr(d.LowerThreshold)).
-		AddRtAttr(ipvsDestAttrAddressFamily, nl.Uint16Attr(d.AddressFamily)).
-		AddRtAttr(ipvsDestAttrTunType, nl.Uint8Attr(uint8(d.TunnelType)))
+	nl.NewRtAttrChild(
+		cmdAttr,
+		ipvsDestAttrForwardingMethod,
+		nl.Uint32Attr(d.ConnectionFlags&ConnectionFlagFwdMask),
+	)
+	nl.NewRtAttrChild(cmdAttr, ipvsDestAttrWeight, nl.Uint32Attr(uint32(d.Weight)))
+	nl.NewRtAttrChild(cmdAttr, ipvsDestAttrUpperThreshold, nl.Uint32Attr(d.UpperThreshold))
+	nl.NewRtAttrChild(cmdAttr, ipvsDestAttrLowerThreshold, nl.Uint32Attr(d.LowerThreshold))
+	nl.NewRtAttrChild(cmdAttr, ipvsDestAttrAddressFamily, nl.Uint16Attr(d.AddressFamily))
+	nl.NewRtAttrChild(cmdAttr, ipvsDestAttrTunType, nl.Uint16Attr(uint16(d.TunnelType)))
+
+	return cmdAttr
 }
 
 func (i *Handle) doCmdwithResponse(s *Service, d *Destination, cmd uint8) ([][]byte, error) {
